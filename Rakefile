@@ -36,7 +36,7 @@ namespace :proxy do
   task :unset do
     puts <<~COMMANDS
     unset http_proxy
-    unset https_proxY
+    unset https_proxy
     unset SSL_CERT_FILE
     COMMANDS
   end
