@@ -22,4 +22,22 @@ namespace :proxy do
     sh "gcloud config list proxy/port"
     sh "gcloud config list core/custom_ca_certs_file"
   end
+
+  desc "export proxy vars"
+  task :vars do
+    puts <<~COMMANDS
+    export http_proxy=http://localhost:8080
+    export https_proxy=http://localhost:8080
+    export SSL_CERT_FILE=~/.mitmproxy/mitmproxy-ca-cert.pem
+    COMMANDS
+  end
+
+  desc "export proxy vars"
+  task :unset do
+    puts <<~COMMANDS
+    unset http_proxy
+    unset https_proxY
+    unset SSL_CERT_FILE
+    COMMANDS
+  end
 end
