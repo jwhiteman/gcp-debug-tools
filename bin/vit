@@ -1,0 +1,10 @@
+#!/bin/bash
+# (v)alidate (i)dentity (t)oken
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 IDENTITY_TOKEN"
+    exit 1
+fi
+
+curl "https://oauth2.googleapis.com/tokeninfo?id_token=$1"
+echo

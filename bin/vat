@@ -1,0 +1,10 @@
+#!/bin/bash
+# (v)alidate (a)ccess (t)oken
+
+if [ -z "$1" ]; then
+    echo "Usage: $0 ACCESS_TOKEN"
+    exit 1
+fi
+
+curl "https://oauth2.googleapis.com/tokeninfo?access_token=$1"
+echo
