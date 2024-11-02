@@ -24,7 +24,8 @@ namespace :proxy do
   end
 
   desc "export proxy vars"
-  task :vars do
+  task :export do
+    puts "Copy & run the following:\n\n"
     puts <<~COMMANDS
     export http_proxy=http://localhost:8080
     export https_proxy=http://localhost:8080
@@ -32,8 +33,9 @@ namespace :proxy do
     COMMANDS
   end
 
-  desc "export proxy vars"
+  desc "unset proxy vars"
   task :unset do
+    puts "Copy & run the following:\n\n"
     puts <<~COMMANDS
     unset http_proxy
     unset https_proxy
