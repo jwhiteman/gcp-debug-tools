@@ -1,0 +1,35 @@
+require "httparty"
+require "optparse"
+require "pry"
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: ruby test-access-token.rb [options]"
+
+  opts.on("-t", "--token ACCESS_TOKEN", "Access token") do |token|
+    options[:token] = token
+  end
+
+  opts.on("-p", "--project PROJECT", "Project") do |project|
+    options[:project] = project
+  end
+end.parse!
+
+if options[:token].nil? || options[:project].nil?
+  puts "Usage: ruby test-access-token.rb --token TOKEN --project PROJECT"
+  exit
+end
+
+
+def test_access_token(access_token, project)
+  HTTParty.get(
+    "https://compute.googleapis.com/compute/v1/projects/#{project}/aggregated/instances",
+    headers: {
+      "Content-Type":  "application/json",
+      "authorization": "Bearer #{access_token}"
+    }
+  )
+end
+
+puts test_access_token(options[:token], options[:project])

@@ -1,0 +1,135 @@
+require "json"
+require "openssl"
+require "base64"
+require "httparty"
+require "optparse"
+require "pry"
+
+GCLOUD_CLIENT_ID = "32555940559.apps.googleusercontent.com".freeze
+
+options = {}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: ruby jwt-bearer.rb [options]"
+
+  opts.on("-k", "--keyfile PATH", "Path to the key file") do |keyfile|
+    options[:keyfile] = keyfile
+  end
+
+  opts.on("-t", "--type TOKEN_TYPE", "Token type") do |type|
+    options[:type] = (type =~ /id/i) ? "id" : "access"
+  end
+end.parse!
+
+if options[:keyfile].nil? || options[:type].nil?
+  puts "Usage: ruby jwt-bearer.rb --keyfile PATH --type TOKEN_TYPE"
+  exit
+end
+
+def header(private_key_id)
+  {
+    "typ": "JWT",
+    "alg": "RS256",
+    "kid": private_key_id
+  }
+end
+
+def id_token_payload(service_account, expiry: 3600)
+  {
+    "iat": "#{Time.now.to_i}",
+    "exp": "#{Time.now.to_i + expiry}",
+    "iss": service_account,
+    "aud": "https://oauth2.googleapis.com/token",
+    "target_audience": GCLOUD_CLIENT_ID
+  }
+end
+
+def access_token_payload(service_account, expiry: 3600)
+  {
+    "iat":   "#{Time.now.to_i}",
+    "exp":   "#{Time.now.to_i + expiry}",
+    "iss":   service_account,
+    "aud":   "https://oauth2.googleapis.com/token",
+    "scope": ("openid "\
+              "https://www.googleapis.com/auth/userinfo.email "\
+              "https://www.googleapis.com/auth/cloud-platform "\
+              "https://www.googleapis.com/auth/appengine.admin "\
+              "https://www.googleapis.com/auth/sqlservice.login "\
+              "https://www.googleapis.com/auth/compute")
+  }
+end
+
+def encode(string)
+  Base64.
+    strict_encode64(string).
+    gsub(/=/, "")
+end
+
+def access_token_body(key)
+  private_key_id  = key.fetch("private_key_id")
+  service_account = key.fetch("client_email")
+
+  [header(private_key_id), access_token_payload(service_account)].map do |segment|
+    encode(segment.to_json)
+  end.join(".")
+end
+
+def id_token_body(key)
+  private_key_id  = key.fetch("private_key_id")
+  service_account = key.fetch("client_email")
+
+  [header(private_key_id), id_token_payload(service_account)].map do |segment|
+    encode(segment.to_json)
+  end.join(".")
+end
+
+def signature(body, key)
+  private_key = key.fetch("private_key")
+  private_key = OpenSSL::PKey::RSA.new(private_key)
+  digest      = OpenSSL::Digest::SHA256.new
+  signature   = private_key.sign(digest, body)
+
+  encode(signature)
+end
+
+def jwt_bearer_request(jwt)
+  HTTParty.post(
+    "https://oauth2.googleapis.com/token",
+    headers: {
+      "Content-Type"    => "application/x-www-form-urlencoded",
+      "Accept-Encoding" => "gzip"
+    },
+    body: {
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion:  jwt
+    }
+  )
+end
+
+def request_access_token(key)
+  body      = access_token_body(key)
+  signature = signature(body, key) 
+  jwt       = [body, signature].join(".")
+
+  jwt_bearer_request(jwt)
+end
+
+def request_id_token(key)
+  body      = id_token_body(key)
+  signature = signature(body, key) 
+  jwt       = [body, signature].join(".")
+
+  jwt_bearer_request(jwt)
+end
+
+key = JSON.parse(IO.read(options[:keyfile]))
+
+if options[:type] == "access"
+  access_token = request_access_token(key).fetch("access_token")
+  puts "Access token:\n\n"
+  puts access_token
+else
+  id_token = request_id_token(key).fetch("id_token")
+  puts "Id token:\n\n"
+  puts id_token
+end
