@@ -8,7 +8,7 @@ require "json"
 require "httparty"
 require "pry"
 
-subject_token = SOME_SUBJECT_KEY
+subject_token = SOME_SUBJECT_TOKEN
 
 subject_token = JSON.parse(CGI.unescape(subject_token))
 
