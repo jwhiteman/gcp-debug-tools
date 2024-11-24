@@ -15,14 +15,6 @@ namespace :proxy do
     sh "gcloud config unset core/custom_ca_certs_file"
   end
 
-  desc "show proxy status"
-  task :status do
-    sh "gcloud config list proxy/type"
-    sh "gcloud config list proxy/address"
-    sh "gcloud config list proxy/port"
-    sh "gcloud config list core/custom_ca_certs_file"
-  end
-
   desc "export proxy vars"
   task :export do
     puts "Copy & run the following:\n\n"

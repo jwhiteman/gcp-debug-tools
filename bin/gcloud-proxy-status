@@ -1,0 +1,6 @@
+#!/bin/bash
+
+gcloud config list proxy/type
+gcloud config list proxy/address
+gcloud config list proxy/port
+gcloud config list core/custom_ca_certs_file
