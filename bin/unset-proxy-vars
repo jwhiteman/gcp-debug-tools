@@ -1,0 +1,8 @@
+#!/bin/bash
+
+unset http_proxy
+unset https_proxy
+unset SSL_CERT_FILE
+unset AWS_CA_BUNDLE
+
+exec zsh

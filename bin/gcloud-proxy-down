@@ -1,0 +1,6 @@
+#!/bin/bash
+
+gcloud config unset proxy/type
+gcloud config unset proxy/address
+gcloud config unset proxy/port
+gcloud config unset core/custom_ca_certs_file

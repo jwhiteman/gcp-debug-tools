@@ -1,0 +1,6 @@
+#!/bin/bash
+
+gcloud config set proxy/type http_no_tunnel
+gcloud config set proxy/address localhost
+gcloud config set proxy/port 8080
+gcloud config set core/custom_ca_certs_file ~/.mitmproxy/mitmproxy-ca-cert.pem
