@@ -3,5 +3,6 @@
 export http_proxy=http://localhost:8080
 export https_proxy=http://localhost:8080
 export SSL_CERT_FILE=~/.mitmproxy/mitmproxy-ca-cert.pem
+export AWS_CA_BUNDLE=~/.mitmproxy/mitmproxy-ca-cert.pem
 
 exec zsh
