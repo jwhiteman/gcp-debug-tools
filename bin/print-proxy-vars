@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "export http_proxy=http://localhost:8080"
+echo "export https_proxy=http://localhost:8080"
+echo "export SSL_CERT_FILE=~/.mitmproxy/mitmproxy-ca-cert.pem"
+echo "export AWS_CA_BUNDLE=~/.mitmproxy/mitmproxy-ca-cert.pem"

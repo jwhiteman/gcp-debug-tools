@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "unset http_proxy"
+echo "unset https_proxy"
+echo "unset SSL_CERT_FILE"
+echo "unset AWS_CA_BUNDLE"
