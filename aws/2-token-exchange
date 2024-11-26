@@ -1,0 +1,16 @@
+# https://cloud.google.com/iam/docs/workload-identity-federation-with-other-clouds#advanced_scenarios
+
+SUBJECT_TOKEN_TYPE="urn:ietf:params:aws:token-type:aws4_request"
+SUBJECT_TOKEN=TOKEN
+PROJECT_NUMBER=""
+POOL_ID=""
+PROVIDER_ID=""
+
+STS_TOKEN=$(curl https://sts.googleapis.com/v1/token \
+    --data-urlencode "audience=//iam.googleapis.com/projects/$PROJECT_NUMBER/locations/global/workloadIdentityPools/$POOL_ID/providers/$PROVIDER_ID" \
+    --data-urlencode "grant_type=urn:ietf:params:oauth:grant-type:token-exchange" \
+    --data-urlencode "requested_token_type=urn:ietf:params:oauth:token-type:access_token" \
+    --data-urlencode "scope=https://www.googleapis.com/auth/cloud-platform" \
+    --data-urlencode "subject_token_type=$SUBJECT_TOKEN_TYPE" \
+    --data-urlencode "subject_token=$SUBJECT_TOKEN" | jq -r .access_token)
+echo $STS_TOKEN
